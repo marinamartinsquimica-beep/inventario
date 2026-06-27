@@ -49,7 +49,19 @@
         background: #e0e0e0;
     }
 
-    /* Botões principais */
+    /* Botões principais grandes */
+    .btn-main {
+        width: 100%;
+        padding: 18px;
+        font-size: 20px;
+        font-weight: bold;
+        border: none;
+        border-radius: 8px;
+        margin-top: 15px;
+        cursor: pointer;
+    }
+
+    /* Verde – Salvar Entrada */
     #btnSalvar {
         background: #4CAF50;
         color: white;
@@ -58,6 +70,7 @@
         background: #45a049;
     }
 
+    /* Azul – Gerar Excel */
     #btnExcel {
         background: #2196F3;
         color: white;
@@ -66,6 +79,7 @@
         background: #0b7dda;
     }
 
+    /* Vermelho – Reiniciar Entradas */
     #btnReiniciar {
         background: #f44336;
         color: white;
@@ -156,9 +170,9 @@
     <input type="number" id="campoQuantidade">
 </div>
 
-<button id="btnSalvar" onclick="salvarEntrada()">Salvar Entrada</button>
-<button id="btnExcel" onclick="gerarExcel()">Gerar Excel</button>
-<button id="btnReiniciar" onclick="reiniciarEntradas()">Reiniciar Entradas</button>
+<button id="btnSalvar" class="btn-main" onclick="salvarEntrada()">Salvar Entrada</button>
+<button id="btnExcel" class="btn-main" onclick="gerarExcel()">Gerar Excel</button>
+<button id="btnReiniciar" class="btn-main" onclick="reiniciarEntradas()">Reiniciar Entradas</button>
 
 <h2>Inventário - Registros</h2>
 
