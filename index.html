@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inventário</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background: #f5f5f5;
+    }
+
+    h2 {
+        margin-top: 30px;
+    }
+
+    .input-group {
+        margin-bottom: 15px;
+    }
+
+    label {
+        font-weight: bold;
+    }
+
+    input, select {
+        width: 100%;
+        padding: 8px;
+        margin-top: 5px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 25px;
+        background: white;
+    }
+
+    th, td {
+        border: 1px solid #ccc;
+        padding: 10px;
+        text-align: center;
+    }
+
+    th {
+        background: #e0e0e0;
+        cursor: pointer;
+    }
+
+    button {
+        padding: 10px 20px;
+        margin-top: 15px;
+        border: none;
+        border-radius: 5px;
+        background: #4CAF50;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background: #45a049;
+    }
+</style>
+
+</head>
+<body onload="carregarLocalStorage()">
+
+<h2>Inventário - Formulário</h2>
+
+<div class="input-group">
+    <label>Data</label>
+    <input type="date" id="campoData">
+</div>
+
+<div class="input-group">
+    <label>Área</label>
+    <select id="campoArea">
+        <option value="ÁREA SUJA">ÁREA SUJA</option>
+        <option value="ÁREA LIMPA">ÁREA LIMPA</option>
+    </select>
+</div>
+
+<div class="input-group">
+    <label>SKU</label>
+    <input type="text" id="campoSku">
+</div>
+
+<div class="input-group">
+    <label>Lote (formato Lxx.xx)</label>
+    <input type="text" id="campoLote3" maxlength="6" oninput="formatarLote()">
+</div>
+
+<div class="input-group">
+    <label>Data de Postura (formato .xx.xx.xx)</label>
+    <input type="text" id="campoLote10" maxlength="9" oninput="formatarPostura()">
+</div>
+
+<div class="input-group">
+    <label>Lote Completo</label>
+    <input type="text" id="campoLote" disabled>
+</div>
+
+<div class="input-group">
+    <label>Volume</label>
+    <input type="number" id="campoVolume">
+</div>
+
+<div class="input-group">
+    <label>Tipo</label>
+    <select id="campoTipo">
+        <option value="CAIXA">CAIXA</option>
+        <option value="OVOS">OVOS</option>
+    </select>
+</div>
+
+<div class="input-group">
+    <label>Quantidade</label>
+    <input type="number" id="campoQuantidade">
+</div>
+
+<button onclick="salvarEntrada()">Salvar</button>
+
+<h2>Inventário - Registros</h2>
+
+<table id="tabela">
+    <thead>
+        <tr>
+            <th>DATA</th>
+            <th>ÁREA</th>
+            <th>SKU</th>
+            <th>LOTE COMPLETO</th>
+            <th>LOTE</th>
+            <th>POST</th>
+            <th>VOLUME</th>
+            <th>TIPO</th>
+            <th>QUANTIDADE</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<script>
+
+function formatarDataBR(dataISO) {
+    let partes = dataISO.split("-");
+    return partes[2] + "/" + partes[1] + "/" + partes[0];
+}
+
+function formatarLote() {
+    let v = campoLote3.value.replace(/[^0-9]/g, "");
+    if (v.length >= 2) campoLote3.value = "L" + v.substring(0, 2) + "." + v.substring(2, 4);
+}
+
+function formatarPostura() {
+    let v = campoLote10.value.replace(/[^0-9]/g, "");
+    if (v.length >= 2) campoLote10.value = "." + v.substring(0, 2) + "." + v.substring(2, 4) + "." + v.substring(4, 6);
+}
+
+function salvarEntrada() {
+    let dataISO = campoData.value;
+    let dataBR = formatarDataBR(dataISO);
+
+    let area = campoArea.value;
+    let sku = campoSku.value;
+    let loteCompleto = campoLote.value;
+    let lote = campoLote3.value;
+    let postura = campoLote10.value;
+    let volume = campoVolume.value;
+    let tipo = campoTipo.value;
+    let quantidade = campoQuantidade.value;
+
+    if (!dataISO || !sku || !loteCompleto || !volume || !quantidade) {
+        alert("Preencha todos os campos obrigatórios.");
+        return;
+    }
+
+    let tbody = document.querySelector("#tabela tbody");
+
+    let linha = tbody.insertRow();
+    linha.innerHTML = `
+        <td>${dataBR}</td>
+        <td>${area}</td>
+        <td>${sku}</td>
+        <td>${loteCompleto}</td>
+        <td>${lote}</td>
+        <td>${postura}</td>
+        <td>${volume}</td>
+        <td>${tipo}</td>
+        <td>${quantidade}</td>
+    `;
+
+    salvarLocalStorage();
+    limparCampos();
+}
+
+function salvarLocalStorage() {
+    let tbody = document.querySelector("#tabela tbody");
+    let dados = [];
+
+    for (let linha of tbody.rows) {
+        dados.push({
+            data: linha.cells[0].innerText,
+            area: linha.cells[1].innerText,
+            sku: linha.cells[2].innerText,
+            loteCompleto: linha.cells[3].innerText,
+            lote: linha.cells[4].innerText,
+            postura: linha.cells[5].innerText,
+            volume: linha.cells[6].innerText,
+            tipo: linha.cells[7].innerText,
+            quantidade: linha.cells[8].innerText
+        });
+    }
+
+    localStorage.setItem("entradas", JSON.stringify(dados));
+}
+
+function carregarLocalStorage() {
+    let dados = JSON.parse(localStorage.getItem("entradas") || "[]");
+    let tbody = document.querySelector("#tabela tbody");
+
+    dados.forEach(item => {
+        let linha = tbody.insertRow();
+        linha.innerHTML = `
+            <td>${item.data}</td>
+            <td>${item.area}</td>
+            <td>${item.sku}</td>
+            <td>${item.loteCompleto}</td>
+            <td>${item.lote}</td>
+            <td>${item.postura}</td>
+            <td>${item.volume}</td>
+            <td>${item.tipo}</td>
+            <td>${item.quantidade}</td>
+        `;
+    });
+}
+
+function limparCampos() {
+    campoSku.value = "";
+    campoLote3.value = "";
+    campoLote10.value = "";
+    campoLote.value = "";
+    campoVolume.value = "";
+    campoQuantidade.value = "";
+}
+
+</script>
+
+</body>
+</html>
