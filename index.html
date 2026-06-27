@@ -3,13 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
 <title>Inventário</title>
+
+<link rel="manifest" href="manifest.json">
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
-<link rel="apple-touch-startup-image" href="splash-2732x2732.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<script>
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("service-worker.js");
+}
+</script>
 
 <style>
     :root {
@@ -37,7 +42,6 @@
         text-align: center;
     }
 
-    /* GRUPO DE INPUT */
     .input-group {
         margin-bottom: 22px;
     }
@@ -49,7 +53,6 @@
         display: block;
     }
 
-    /* INPUT ESTILO APP MOBILE */
     .input-wrapper {
         position: relative;
     }
@@ -71,7 +74,6 @@
         border-color: var(--input-focus);
     }
 
-    /* ÍCONES DENTRO DO INPUT */
     .input-icon {
         position: absolute;
         right: 14px;
@@ -81,7 +83,6 @@
         opacity: 0.7;
     }
 
-    /* BOTÕES GRANDES */
     .btn-main {
         width: 100%;
         padding: 20px;
@@ -97,7 +98,6 @@
     #btnExcel  { background: #2196F3; color: white; }
     #btnReiniciar { background: #f44336; color: white; }
 
-    /* TABELA */
     .table-container {
         overflow-x: auto;
         margin-top: 30px;
@@ -122,7 +122,6 @@
         background: var(--table-header);
     }
 
-    /* BOTÕES PEQUENOS */
     .btn-small {
         padding: 10px 16px;
         font-size: 16px;
@@ -140,7 +139,6 @@
 
 <h2>Inventário - Formulário</h2>
 
-<!-- DATA -->
 <div class="input-group">
     <label>Data</label>
     <div class="input-wrapper">
@@ -149,7 +147,6 @@
     </div>
 </div>
 
-<!-- ÁREA -->
 <div class="input-group">
     <label>Área</label>
     <div class="input-wrapper">
@@ -161,7 +158,6 @@
     </div>
 </div>
 
-<!-- SKU -->
 <div class="input-group">
     <label>SKU</label>
     <div class="input-wrapper">
@@ -170,7 +166,6 @@
     </div>
 </div>
 
-<!-- LOTE -->
 <div class="input-group">
     <label>Lote (formato Lxx.xx)</label>
     <div class="input-wrapper">
@@ -180,7 +175,6 @@
     </div>
 </div>
 
-<!-- POSTURA -->
 <div class="input-group">
     <label>Data de Postura (.xx.xx.xx)</label>
     <div class="input-wrapper">
@@ -190,7 +184,6 @@
     </div>
 </div>
 
-<!-- LOTE COMPLETO -->
 <div class="input-group">
     <label>Lote Completo</label>
     <div class="input-wrapper">
@@ -199,7 +192,6 @@
     </div>
 </div>
 
-<!-- TIPO -->
 <div class="input-group">
     <label>Tipo</label>
     <div class="input-wrapper">
@@ -211,7 +203,6 @@
     </div>
 </div>
 
-<!-- QUANTIDADE -->
 <div class="input-group">
     <label>Quantidade</label>
     <div class="input-wrapper">
@@ -220,7 +211,6 @@
     </div>
 </div>
 
-<!-- BOTÕES -->
 <button id="btnSalvar" class="btn-main" onclick="salvarEntrada()">Salvar Entrada</button>
 <button id="btnExcel" class="btn-main" onclick="gerarExcel()">Gerar Excel</button>
 <button id="btnReiniciar" class="btn-main" onclick="reiniciarEntradas()">Reiniciar Entradas</button>
@@ -247,7 +237,6 @@
 </div>
 
 <script>
-/* FUNÇÕES ORIGINAIS — TODAS MANTIDAS */
 function formatarDataBR(dataISO) {
     let partes = dataISO.split("-");
     return partes[2] + "/" + partes[1] + "/" + partes[0];
@@ -430,3 +419,4 @@ function reiniciarEntradas() {
 
 </body>
 </html>
+
