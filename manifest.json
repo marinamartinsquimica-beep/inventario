@@ -1,12 +1,12 @@
 {
   "name": "Inventário",
   "short_name": "Inventário",
-  "start_url": "./inicio.html",
-  "scope": "./",
+  "description": "Aplicativo de controle de inventário com tema escuro automático e splash personalizada.",
+  "start_url": "./index.html",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#ffffff",
-  "theme_color": "#ffffff",
+  "background_color": "#000000",
+  "theme_color": "#000000",
   "icons": [
     {
       "src": "icon-192.png",
@@ -18,5 +18,11 @@
       "sizes": "512x512",
       "type": "image/png"
     }
-  ]
+  ],
+  "launch_screen": {
+    "image": "splash-2732x2732.png",
+    "background_color": "#000000",
+    "resize_mode": "contain"
+  }
 }
+
