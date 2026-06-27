@@ -1,4 +1,4 @@
-const CACHE_NAME = "inventario-cache-v10";
+const CACHE_NAME = "inventario-cache-v1";
 
 const FILES_TO_CACHE = [
   "./",
@@ -20,7 +20,7 @@ self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys().then(keys =>
       Promise.all(
-        keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
+        keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
       )
     )
   );
@@ -29,8 +29,8 @@ self.addEventListener("activate", event => {
 
 self.addEventListener("fetch", event => {
   event.respondWith(
-    caches.match(event.request).then(resp => {
-      return resp || fetch(event.request).catch(() => caches.match("./inicio.html"));
+    caches.match(event.request).then(response => {
+      return response || fetch(event.request).catch(() => caches.match("./inicio.html"));
     })
   );
 });
