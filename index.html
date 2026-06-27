@@ -113,12 +113,14 @@
 
 <div class="input-group">
     <label>Lote (formato Lxx.xx)</label>
-    <input type="text" id="campoLote3" maxlength="6" oninput="formatarLote()">
+    <input type="text" id="campoLote3" maxlength="6"
+           oninput="formatarLote(); atualizarLoteCompleto();">
 </div>
 
 <div class="input-group">
     <label>Data de Postura (formato .xx.xx.xx)</label>
-    <input type="text" id="campoLote10" maxlength="9" oninput="formatarPostura()">
+    <input type="text" id="campoLote10" maxlength="9"
+           oninput="formatarPostura(); atualizarLoteCompleto();">
 </div>
 
 <div class="input-group">
@@ -188,6 +190,10 @@ function formatarLote() {
 function formatarPostura() {
     let v = campoLote10.value.replace(/[^0-9]/g, "");
     if (v.length >= 2) campoLote10.value = "." + v.substring(0, 2) + "." + v.substring(2, 4) + "." + v.substring(4, 6);
+}
+
+function atualizarLoteCompleto() {
+    campoLote.value = campoLote3.value + " " + campoLote10.value;
 }
 
 function salvarEntrada() {
