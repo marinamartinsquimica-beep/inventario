@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Inventário</title>
 
+<!-- Biblioteca para gerar XLSX -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
 <style>
     body {
         font-family: Arial, sans-serif;
@@ -342,17 +345,28 @@ function gerarExcel() {
         return;
     }
 
-    let csv = "DATA,ÁREA,SKU,LOTE COMPLETO,LOTE,POST,TIPO,QUANTIDADE\n";
+    let linhas = [
+        ["DATA", "ÁREA", "SKU", "LOTE COMPLETO", "LOTE", "POST", "TIPO", "QUANTIDADE"]
+    ];
 
     dados.forEach(item => {
-        csv += `${item.data},${item.area},${item.sku},${item.loteCompleto},${item.lote},${item.postura},${item.tipo},${item.quantidade}\n`;
+        linhas.push([
+            item.data,
+            item.area,
+            item.sku,
+            item.loteCompleto,
+            item.lote,
+            item.postura,
+            item.tipo,
+            item.quantidade
+        ]);
     });
 
-    let blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    let link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "inventario.csv";
-    link.click();
+    let ws = XLSX.utils.aoa_to_sheet(linhas);
+    let wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Inventário");
+
+    XLSX.writeFile(wb, "inventario.xlsx");
 }
 
 function reiniciarEntradas() {
