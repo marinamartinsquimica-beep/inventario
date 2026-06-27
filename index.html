@@ -16,57 +16,79 @@
         --bg: #121212;
         --text: #ffffff;
         --input-bg: #1e1e1e;
-        --input-border: #444;
+        --input-border: #2e2e2e;
+        --input-focus: #3f8cff;
         --table-bg: #1e1e1e;
-        --table-header: #333;
+        --table-header: #2a2a2a;
         --table-text: #ffffff;
     }
 
     body {
         font-family: Arial, sans-serif;
-        margin: 12px;
+        margin: 0;
+        padding: 20px;
         background: var(--bg);
         color: var(--text);
-        padding-bottom: 40px;
     }
 
     h2 {
-        font-size: 26px;
-        margin-top: 25px;
-        margin-bottom: 10px;
+        font-size: 24px;
+        margin-bottom: 20px;
         text-align: center;
-        color: var(--text);
     }
 
+    /* GRUPO DE INPUT */
     .input-group {
-        margin-bottom: 18px;
+        margin-bottom: 22px;
     }
 
     label {
+        font-size: 16px;
         font-weight: bold;
-        font-size: 18px;
-        color: var(--text);
+        margin-bottom: 6px;
+        display: block;
     }
 
-    input, select {
+    /* INPUT ESTILO APP MOBILE */
+    .input-wrapper {
+        position: relative;
+    }
+
+    .input-wrapper input,
+    .input-wrapper select {
         width: 100%;
-        padding: 14px;
-        margin-top: 8px;
-        margin-bottom: 12px;
-        border-radius: 10px;
+        padding: 16px 45px 16px 16px;
+        font-size: 18px;
+        border-radius: 14px;
         border: 1px solid var(--input-border);
         background: var(--input-bg);
         color: var(--text);
-        font-size: 18px;
+        outline: none;
     }
 
+    .input-wrapper input:focus,
+    .input-wrapper select:focus {
+        border-color: var(--input-focus);
+    }
+
+    /* ÍCONES DENTRO DO INPUT */
+    .input-icon {
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 22px;
+        opacity: 0.7;
+    }
+
+    /* BOTÕES GRANDES */
     .btn-main {
         width: 100%;
-        padding: 22px;
+        padding: 20px;
         font-size: 22px;
         font-weight: bold;
+        border-radius: 14px;
         border: none;
-        border-radius: 12px;
         margin-top: 18px;
         cursor: pointer;
     }
@@ -75,10 +97,10 @@
     #btnExcel  { background: #2196F3; color: white; }
     #btnReiniciar { background: #f44336; color: white; }
 
+    /* TABELA */
     .table-container {
-        width: 100%;
         overflow-x: auto;
-        margin-top: 25px;
+        margin-top: 30px;
     }
 
     table {
@@ -91,21 +113,21 @@
 
     th, td {
         border: 1px solid var(--input-border);
-        padding: 12px;
+        padding: 14px;
         text-align: center;
         font-size: 18px;
     }
 
     th {
         background: var(--table-header);
-        color: var(--table-text);
     }
 
+    /* BOTÕES PEQUENOS */
     .btn-small {
         padding: 10px 16px;
         font-size: 16px;
+        border-radius: 10px;
         border: none;
-        border-radius: 8px;
         cursor: pointer;
     }
 
@@ -118,54 +140,87 @@
 
 <h2>Inventário - Formulário</h2>
 
+<!-- DATA -->
 <div class="input-group">
     <label>Data</label>
-    <input type="date" id="campoData">
+    <div class="input-wrapper">
+        <input type="date" id="campoData">
+        <span class="input-icon">📅</span>
+    </div>
 </div>
 
+<!-- ÁREA -->
 <div class="input-group">
     <label>Área</label>
-    <select id="campoArea">
-        <option value="ÁREA SUJA">ÁREA SUJA</option>
-        <option value="ÁREA LIMPA">ÁREA LIMPA</option>
-    </select>
+    <div class="input-wrapper">
+        <select id="campoArea">
+            <option value="ÁREA SUJA">ÁREA SUJA</option>
+            <option value="ÁREA LIMPA">ÁREA LIMPA</option>
+        </select>
+        <span class="input-icon">📍</span>
+    </div>
 </div>
 
+<!-- SKU -->
 <div class="input-group">
     <label>SKU</label>
-    <input type="text" id="campoSku">
+    <div class="input-wrapper">
+        <input type="text" id="campoSku">
+        <span class="input-icon">🔢</span>
+    </div>
 </div>
 
+<!-- LOTE -->
 <div class="input-group">
     <label>Lote (formato Lxx.xx)</label>
-    <input type="text" id="campoLote3" maxlength="6"
-           oninput="formatarLote(); atualizarLoteCompleto();">
+    <div class="input-wrapper">
+        <input type="text" id="campoLote3" maxlength="6"
+               oninput="formatarLote(); atualizarLoteCompleto();">
+        <span class="input-icon">🏷️</span>
+    </div>
 </div>
 
+<!-- POSTURA -->
 <div class="input-group">
-    <label>Data de Postura (formato .xx.xx.xx)</label>
-    <input type="text" id="campoLote10" maxlength="9"
-           oninput="formatarPostura(); atualizarLoteCompleto();">
+    <label>Data de Postura (.xx.xx.xx)</label>
+    <div class="input-wrapper">
+        <input type="text" id="campoLote10" maxlength="9"
+               oninput="formatarPostura(); atualizarLoteCompleto();">
+        <span class="input-icon">🥚</span>
+    </div>
 </div>
 
+<!-- LOTE COMPLETO -->
 <div class="input-group">
     <label>Lote Completo</label>
-    <input type="text" id="campoLote" disabled>
+    <div class="input-wrapper">
+        <input type="text" id="campoLote" disabled>
+        <span class="input-icon">✔️</span>
+    </div>
 </div>
 
+<!-- TIPO -->
 <div class="input-group">
     <label>Tipo</label>
-    <select id="campoTipo">
-        <option value="CAIXA">CAIXA</option>
-        <option value="OVOS">OVOS</option>
-    </select>
+    <div class="input-wrapper">
+        <select id="campoTipo">
+            <option value="CAIXA">CAIXA</option>
+            <option value="OVOS">OVOS</option>
+        </select>
+        <span class="input-icon">📦</span>
+    </div>
 </div>
 
+<!-- QUANTIDADE -->
 <div class="input-group">
     <label>Quantidade</label>
-    <input type="number" id="campoQuantidade">
+    <div class="input-wrapper">
+        <input type="number" id="campoQuantidade">
+        <span class="input-icon">🔢</span>
+    </div>
 </div>
 
+<!-- BOTÕES -->
 <button id="btnSalvar" class="btn-main" onclick="salvarEntrada()">Salvar Entrada</button>
 <button id="btnExcel" class="btn-main" onclick="gerarExcel()">Gerar Excel</button>
 <button id="btnReiniciar" class="btn-main" onclick="reiniciarEntradas()">Reiniciar Entradas</button>
@@ -192,6 +247,7 @@
 </div>
 
 <script>
+/* FUNÇÕES ORIGINAIS — TODAS MANTIDAS */
 function formatarDataBR(dataISO) {
     let partes = dataISO.split("-");
     return partes[2] + "/" + partes[1] + "/" + partes[0];
@@ -374,4 +430,3 @@ function reiniciarEntradas() {
 
 </body>
 </html>
-
