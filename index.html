@@ -47,12 +47,12 @@
 
     th {
         background: #e0e0e0;
-        cursor: pointer;
     }
 
     button {
         padding: 10px 20px;
         margin-top: 15px;
+        margin-right: 10px;
         border: none;
         border-radius: 5px;
         background: #4CAF50;
@@ -63,6 +63,28 @@
 
     button:hover {
         background: #45a049;
+    }
+
+    .btn-small {
+        padding: 5px 10px;
+        font-size: 13px;
+        margin: 2px;
+    }
+
+    .btn-edit {
+        background: #2196F3;
+    }
+
+    .btn-edit:hover {
+        background: #0b7dda;
+    }
+
+    .btn-delete {
+        background: #f44336;
+    }
+
+    .btn-delete:hover {
+        background: #da190b;
     }
 </style>
 
@@ -122,7 +144,9 @@
     <input type="number" id="campoQuantidade">
 </div>
 
-<button onclick="salvarEntrada()">Salvar</button>
+<button onclick="salvarEntrada()">Salvar Entrada</button>
+<button onclick="gerarExcel()">Gerar Excel</button>
+<button onclick="reiniciarEntradas()">Apagar Entradas</button>
 
 <h2>Inventário - Registros</h2>
 
@@ -138,6 +162,7 @@
             <th>VOLUME</th>
             <th>TIPO</th>
             <th>QUANTIDADE</th>
+            <th>AÇÃO</th>
         </tr>
     </thead>
     <tbody></tbody>
@@ -148,6 +173,11 @@
 function formatarDataBR(dataISO) {
     let partes = dataISO.split("-");
     return partes[2] + "/" + partes[1] + "/" + partes[0];
+}
+
+function converterDataISO(dataBR) {
+    let partes = dataBR.split("/");
+    return `${partes[2]}-${partes[1]}-${partes[0]}`;
 }
 
 function formatarLote() {
@@ -179,8 +209,8 @@ function salvarEntrada() {
     }
 
     let tbody = document.querySelector("#tabela tbody");
-
     let linha = tbody.insertRow();
+
     linha.innerHTML = `
         <td>${dataBR}</td>
         <td>${area}</td>
@@ -191,10 +221,40 @@ function salvarEntrada() {
         <td>${volume}</td>
         <td>${tipo}</td>
         <td>${quantidade}</td>
+        <td>
+            <button class="btn-small btn-edit" onclick="editarLinha(this)">Editar</button>
+            <button class="btn-small btn-delete" onclick="excluirLinha(this)">Excluir</button>
+        </td>
     `;
 
     salvarLocalStorage();
     limparCampos();
+}
+
+function editarLinha(botao) {
+    let linha = botao.parentNode.parentNode;
+    let celulas = linha.cells;
+
+    campoData.value = converterDataISO(celulas[0].innerText);
+    campoArea.value = celulas[1].innerText;
+    campoSku.value = celulas[2].innerText;
+    campoLote.value = celulas[3].innerText;
+    campoLote3.value = celulas[4].innerText;
+    campoLote10.value = celulas[5].innerText;
+    campoVolume.value = celulas[6].innerText;
+    campoTipo.value = celulas[7].innerText;
+    campoQuantidade.value = celulas[8].innerText;
+
+    linha.remove();
+    salvarLocalStorage();
+}
+
+function excluirLinha(botao) {
+    if (confirm("Deseja excluir esta entrada?")) {
+        let linha = botao.parentNode.parentNode;
+        linha.remove();
+        salvarLocalStorage();
+    }
 }
 
 function salvarLocalStorage() {
@@ -234,6 +294,10 @@ function carregarLocalStorage() {
             <td>${item.volume}</td>
             <td>${item.tipo}</td>
             <td>${item.quantidade}</td>
+            <td>
+                <button class="btn-small btn-edit" onclick="editarLinha(this)">Editar</button>
+                <button class="btn-small btn-delete" onclick="excluirLinha(this)">Excluir</button>
+            </td>
         `;
     });
 }
@@ -245,6 +309,35 @@ function limparCampos() {
     campoLote.value = "";
     campoVolume.value = "";
     campoQuantidade.value = "";
+}
+
+function gerarExcel() {
+    let dados = JSON.parse(localStorage.getItem("entradas") || "[]");
+
+    if (dados.length === 0) {
+        alert("Nenhuma entrada para exportar.");
+        return;
+    }
+
+    let csv = "DATA,ÁREA,SKU,LOTE COMPLETO,LOTE,POST,VOLUME,TIPO,QUANTIDADE\n";
+
+    dados.forEach(item => {
+        csv += `${item.data},${item.area},${item.sku},${item.loteCompleto},${item.lote},${item.postura},${item.volume},${item.tipo},${item.quantidade}\n`;
+    });
+
+    let blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    let link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "inventario.csv";
+    link.click();
+}
+
+function reiniciarEntradas() {
+    if (confirm("Tem certeza que deseja apagar todas as entradas?")) {
+        localStorage.removeItem("entradas");
+        document.querySelector("#tabela tbody").innerHTML = "";
+        alert("Entradas apagadas.");
+    }
 }
 
 </script>
