@@ -49,30 +49,44 @@
         background: #e0e0e0;
     }
 
-    button {
-        padding: 10px 20px;
-        margin-top: 15px;
-        margin-right: 10px;
-        border: none;
-        border-radius: 5px;
+    /* Botões principais */
+    #btnSalvar {
         background: #4CAF50;
         color: white;
-        font-size: 16px;
-        cursor: pointer;
     }
-
-    button:hover {
+    #btnSalvar:hover {
         background: #45a049;
     }
 
+    #btnExcel {
+        background: #2196F3;
+        color: white;
+    }
+    #btnExcel:hover {
+        background: #0b7dda;
+    }
+
+    #btnReiniciar {
+        background: #f44336;
+        color: white;
+    }
+    #btnReiniciar:hover {
+        background: #da190b;
+    }
+
+    /* Botões pequenos */
     .btn-small {
         padding: 5px 10px;
         font-size: 13px;
         margin: 2px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
     }
 
     .btn-edit {
         background: #2196F3;
+        color: white;
     }
 
     .btn-edit:hover {
@@ -81,6 +95,7 @@
 
     .btn-delete {
         background: #f44336;
+        color: white;
     }
 
     .btn-delete:hover {
@@ -129,11 +144,6 @@
 </div>
 
 <div class="input-group">
-    <label>Volume</label>
-    <input type="number" id="campoVolume">
-</div>
-
-<div class="input-group">
     <label>Tipo</label>
     <select id="campoTipo">
         <option value="CAIXA">CAIXA</option>
@@ -146,9 +156,9 @@
     <input type="number" id="campoQuantidade">
 </div>
 
-<button onclick="salvarEntrada()">Salvar Entrada</button>
-<button onclick="gerarExcel()">Gerar Excel</button>
-<button onclick="reiniciarEntradas()">Apagar Entradas</button>
+<button id="btnSalvar" onclick="salvarEntrada()">Salvar Entrada</button>
+<button id="btnExcel" onclick="gerarExcel()">Gerar Excel</button>
+<button id="btnReiniciar" onclick="reiniciarEntradas()">Reiniciar Entradas</button>
 
 <h2>Inventário - Registros</h2>
 
@@ -161,7 +171,6 @@
             <th>LOTE COMPLETO</th>
             <th>LOTE</th>
             <th>POST</th>
-            <th>VOLUME</th>
             <th>TIPO</th>
             <th>QUANTIDADE</th>
             <th>AÇÃO</th>
@@ -205,11 +214,10 @@ function salvarEntrada() {
     let loteCompleto = campoLote.value;
     let lote = campoLote3.value;
     let postura = campoLote10.value;
-    let volume = campoVolume.value;
     let tipo = campoTipo.value;
     let quantidade = campoQuantidade.value;
 
-    if (!dataISO || !sku || !loteCompleto || !volume || !quantidade) {
+    if (!dataISO || !sku || !loteCompleto || !quantidade) {
         alert("Preencha todos os campos obrigatórios.");
         return;
     }
@@ -224,7 +232,6 @@ function salvarEntrada() {
         <td>${loteCompleto}</td>
         <td>${lote}</td>
         <td>${postura}</td>
-        <td>${volume}</td>
         <td>${tipo}</td>
         <td>${quantidade}</td>
         <td>
@@ -247,9 +254,8 @@ function editarLinha(botao) {
     campoLote.value = celulas[3].innerText;
     campoLote3.value = celulas[4].innerText;
     campoLote10.value = celulas[5].innerText;
-    campoVolume.value = celulas[6].innerText;
-    campoTipo.value = celulas[7].innerText;
-    campoQuantidade.value = celulas[8].innerText;
+    campoTipo.value = celulas[6].innerText;
+    campoQuantidade.value = celulas[7].innerText;
 
     linha.remove();
     salvarLocalStorage();
@@ -275,9 +281,8 @@ function salvarLocalStorage() {
             loteCompleto: linha.cells[3].innerText,
             lote: linha.cells[4].innerText,
             postura: linha.cells[5].innerText,
-            volume: linha.cells[6].innerText,
-            tipo: linha.cells[7].innerText,
-            quantidade: linha.cells[8].innerText
+            tipo: linha.cells[6].innerText,
+            quantidade: linha.cells[7].innerText
         });
     }
 
@@ -297,7 +302,6 @@ function carregarLocalStorage() {
             <td>${item.loteCompleto}</td>
             <td>${item.lote}</td>
             <td>${item.postura}</td>
-            <td>${item.volume}</td>
             <td>${item.tipo}</td>
             <td>${item.quantidade}</td>
             <td>
@@ -313,7 +317,6 @@ function limparCampos() {
     campoLote3.value = "";
     campoLote10.value = "";
     campoLote.value = "";
-    campoVolume.value = "";
     campoQuantidade.value = "";
 }
 
@@ -325,10 +328,10 @@ function gerarExcel() {
         return;
     }
 
-    let csv = "DATA,ÁREA,SKU,LOTE COMPLETO,LOTE,POST,VOLUME,TIPO,QUANTIDADE\n";
+    let csv = "DATA,ÁREA,SKU,LOTE COMPLETO,LOTE,POST,TIPO,QUANTIDADE\n";
 
     dados.forEach(item => {
-        csv += `${item.data},${item.area},${item.sku},${item.loteCompleto},${item.lote},${item.postura},${item.volume},${item.tipo},${item.quantidade}\n`;
+        csv += `${item.data},${item.area},${item.sku},${item.loteCompleto},${item.lote},${item.postura},${item.tipo},${item.quantidade}\n`;
     });
 
     let blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
