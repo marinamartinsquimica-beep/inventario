@@ -1,5 +1,5 @@
 // Versão do cache (mude esse nome quando atualizar arquivos)
-const CACHE_NAME = "inventario-v3";
+const CACHE_NAME = "inventario-v4"; // versão nova
 
 const URLS_TO_CACHE = [
   "./",
@@ -13,6 +13,7 @@ const URLS_TO_CACHE = [
 
 // Instalação: guarda arquivos no cache
 self.addEventListener("install", event => {
+  self.skipWaiting(); // força ativação imediata
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
       return cache.addAll(URLS_TO_CACHE);
@@ -31,13 +32,13 @@ self.addEventListener("activate", event => {
       );
     })
   );
+  self.clients.claim(); // força atualização nos clientes
 });
 
 // Fetch: responde com cache ou rede
 self.addEventListener("fetch", event => {
   event.respondWith(
     caches.match(event.request).then(response => {
-      // Se tiver no cache, usa; senão, busca na rede
       return response || fetch(event.request);
     })
   );
