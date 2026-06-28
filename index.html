@@ -2,37 +2,48 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <title>Inventário - Formulário</title>
 
 <style>
-    body {
+    /* Remove qualquer rolagem lateral */
+    html, body {
         margin: 0;
-        padding: 20px;
+        padding: 0;
+        overflow-x: hidden;
         background: #000000;
         color: white;
         font-family: Arial, sans-serif;
+    }
+
+    body {
         display: flex;
         flex-direction: column;
         align-items: center;
+        padding-top: 20px;
         min-height: 100vh;
+        box-sizing: border-box;
     }
 
     h2 {
         margin-bottom: 20px;
         text-align: center;
+        width: 100%;
     }
 
-    form {
+    /* CONTAINER RESPONSIVO REAL */
+    .container {
         width: 100%;
-        max-width: 600px;
+        max-width: 380px; /* tamanho ideal para celular */
+        padding: 0 20px;
+        box-sizing: border-box;
         display: flex;
         flex-direction: column;
         gap: 15px;
     }
 
-    /* Remove QUALQUER ícone interno */
+    /* Remove ícones internos */
     input,
     select,
     textarea {
@@ -42,30 +53,16 @@
         appearance: none !important;
     }
 
-    /* Remove ícones de calendário */
+    /* Remove ícone do calendário */
     input[type="date"]::-webkit-calendar-picker-indicator {
         display: none !important;
-        -webkit-appearance: none !important;
     }
 
-    /* Remove setas de number */
+    /* Remove setas do number */
     input[type="number"]::-webkit-inner-spin-button,
     input[type="number"]::-webkit-outer-spin-button {
         -webkit-appearance: none !important;
         margin: 0 !important;
-    }
-
-    /* Remove ícones automáticos do Chrome */
-    input::-webkit-search-decoration,
-    input::-webkit-search-cancel-button,
-    input::-webkit-search-results-button,
-    input::-webkit-search-results-decoration {
-        display: none !important;
-    }
-
-    /* Remove seta do select */
-    select::-ms-expand {
-        display: none !important;
     }
 
     /* Estilo dos campos */
@@ -77,31 +74,25 @@
         font-size: 18px;
         border-radius: 10px;
         border: 1px solid #444;
-        color: white;
         background-color: #1a1a1a;
+        color: white;
         box-sizing: border-box;
     }
 
     button {
         background: #2196F3;
         color: white;
-        padding: 16px 24px;
+        padding: 16px;
         font-size: 20px;
         border-radius: 12px;
         border: none;
         cursor: pointer;
+        width: 100%;
         transition: 0.2s;
     }
 
     button:active {
         transform: scale(0.97);
-    }
-
-    @media (max-width: 768px) {
-        input, select, textarea, button {
-            width: 100%;
-            font-size: 16px;
-        }
     }
 </style>
 </head>
@@ -110,14 +101,16 @@
 
 <h2>Inventário - Formulário</h2>
 
-<form>
+<div class="container">
+
     <input type="text" placeholder="Data (dd/mm/aaaa)">
     <input type="text" placeholder="Área">
     <input type="text" placeholder="SKU">
     <input type="text" placeholder="Lote (formato Lxx.xx)">
     <input type="text" placeholder="Data de Postura (.xx.xx.xx)">
-    <button type="submit">Salvar</button>
-</form>
+    <button>Salvar</button>
+
+</div>
 
 </body>
 </html>
