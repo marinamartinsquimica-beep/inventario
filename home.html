@@ -6,10 +6,8 @@
 
 <title>Inventário - Home</title>
 
-<!-- Manifest do PWA -->
 <link rel="manifest" href="manifest.json">
 
-<!-- Registro do Service Worker -->
 <script>
 if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("service-worker.js");
@@ -29,11 +27,20 @@ if ("serviceWorker" in navigator) {
         align-items: center;
         height: 100vh;
         text-align: center;
+
+        /* ANIMAÇÃO DE ABERTURA */
+        opacity: 0;
+        animation: fadeIn 1.4s ease forwards;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
     }
 
     .logo {
-        width: 160px;
-        height: 160px;
+        width: 180px;
+        height: 180px;
         margin-bottom: 30px;
     }
 
@@ -70,13 +77,11 @@ if ("serviceWorker" in navigator) {
 
 <body>
 
-<!-- Ícone do app -->
 <img src="icon-512.png" class="logo">
 
 <h1>Inventário</h1>
 <p>Controle rápido e fácil de lotes, postura e estoque.</p>
 
-<!-- Botão para entrar no app -->
 <button class="btn" onclick="window.location.href='index.html'">
     Entrar
 </button>
