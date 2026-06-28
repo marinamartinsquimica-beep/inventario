@@ -4,419 +4,89 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-<title>Inventário</title>
-
-<link rel="manifest" href="manifest.json">
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
-<script>
-if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("service-worker.js");
-}
-</script>
+<title>Inventário - Cadastro</title>
 
 <style>
-    :root {
-        --bg: #121212;
-        --text: #ffffff;
-        --input-bg: #1e1e1e;
-        --input-border: #2e2e2e;
-        --input-focus: #3f8cff;
-        --table-bg: #1e1e1e;
-        --table-header: #2a2a2a;
-        --table-text: #ffffff;
-    }
-
     body {
-        font-family: Arial, sans-serif;
         margin: 0;
         padding: 20px;
-        background: var(--bg);
-        color: var(--text);
+        background: #000000;
+        color: white;
+        font-family: Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
     }
 
     h2 {
-        font-size: 24px;
         margin-bottom: 20px;
         text-align: center;
     }
 
-    .input-group {
-        margin-bottom: 22px;
-    }
-
-    label {
-        font-size: 16px;
-        font-weight: bold;
-        margin-bottom: 6px;
-        display: block;
-    }
-
-    .input-wrapper {
-        position: relative;
-    }
-
-    .input-wrapper input,
-    .input-wrapper select {
+    form {
         width: 100%;
-        padding: 16px 45px 16px 16px;
-        font-size: 18px;
-        border-radius: 14px;
-        border: 1px solid var(--input-border);
-        background: var(--input-bg);
-        color: var(--text);
-        outline: none;
+        max-width: 600px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
     }
 
-    .input-wrapper input:focus,
-    .input-wrapper select:focus {
-        border-color: var(--input-focus);
-    }
-
-    .input-icon {
-        position: absolute;
-        right: 14px;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 22px;
-        opacity: 0.7;
-    }
-
-    .btn-main {
+    input[type="text"],
+    input[type="number"],
+    input[type="email"],
+    select,
+    textarea {
+        background-image: none !important;
+        background-repeat: no-repeat;
+        background-position: left center;
+        background-size: 0;
         width: 100%;
-        padding: 20px;
-        font-size: 22px;
-        font-weight: bold;
-        border-radius: 14px;
-        border: none;
-        margin-top: 18px;
-        cursor: pointer;
-    }
-
-    #btnSalvar { background: #4CAF50; color: white; }
-    #btnExcel  { background: #2196F3; color: white; }
-    #btnReiniciar { background: #f44336; color: white; }
-
-    .table-container {
-        overflow-x: auto;
-        margin-top: 30px;
-    }
-
-    table {
-        width: 100%;
-        min-width: 900px;
-        border-collapse: collapse;
-        background: var(--table-bg);
-        color: var(--table-text);
-    }
-
-    th, td {
-        border: 1px solid var(--input-border);
         padding: 14px;
-        text-align: center;
         font-size: 18px;
-    }
-
-    th {
-        background: var(--table-header);
-    }
-
-    .btn-small {
-        padding: 10px 16px;
-        font-size: 16px;
         border-radius: 10px;
+        border: 1px solid #444;
+        color: white;
+        background-color: #1a1a1a;
+        box-sizing: border-box;
+    }
+
+    button {
+        background: #2196F3;
+        color: white;
+        padding: 16px 24px;
+        font-size: 20px;
+        border-radius: 12px;
         border: none;
         cursor: pointer;
+        transition: 0.2s;
     }
 
-    .btn-edit { background: #2196F3; color: white; }
-    .btn-delete { background: #f44336; color: white; }
+    button:active {
+        transform: scale(0.97);
+    }
+
+    @media (max-width: 768px) {
+        input, select, textarea, button {
+            width: 100%;
+            font-size: 16px;
+        }
+    }
 </style>
-
 </head>
-<body onload="carregarLocalStorage()">
 
-<h2>Inventário - Formulário</h2>
+<body>
 
-<div class="input-group">
-    <label>Data</label>
-    <div class="input-wrapper">
-        <input type="date" id="campoData">
-        <span class="input-icon">📅</span>
-    </div>
-</div>
+<h2>Cadastro de Lotes</h2>
 
-<div class="input-group">
-    <label>Área</label>
-    <div class="input-wrapper">
-        <select id="campoArea">
-            <option value="ÁREA SUJA">ÁREA SUJA</option>
-            <option value="ÁREA LIMPA">ÁREA LIMPA</option>
-        </select>
-        <span class="input-icon">📍</span>
-    </div>
-</div>
-
-<div class="input-group">
-    <label>SKU</label>
-    <div class="input-wrapper">
-        <input type="text" id="campoSku">
-        <span class="input-icon">🔢</span>
-    </div>
-</div>
-
-<div class="input-group">
-    <label>Lote (formato Lxx.xx)</label>
-    <div class="input-wrapper">
-        <input type="text" id="campoLote3" maxlength="6"
-               oninput="formatarLote(); atualizarLoteCompleto();">
-        <span class="input-icon">🏷️</span>
-    </div>
-</div>
-
-<div class="input-group">
-    <label>Data de Postura (.xx.xx.xx)</label>
-    <div class="input-wrapper">
-        <input type="text" id="campoLote10" maxlength="9"
-               oninput="formatarPostura(); atualizarLoteCompleto();">
-        <span class="input-icon">🥚</span>
-    </div>
-</div>
-
-<div class="input-group">
-    <label>Lote Completo</label>
-    <div class="input-wrapper">
-        <input type="text" id="campoLote" disabled>
-        <span class="input-icon">✔️</span>
-    </div>
-</div>
-
-<div class="input-group">
-    <label>Tipo</label>
-    <div class="input-wrapper">
-        <select id="campoTipo">
-            <option value="CAIXA">CAIXA</option>
-            <option value="OVOS">OVOS</option>
-        </select>
-        <span class="input-icon">📦</span>
-    </div>
-</div>
-
-<div class="input-group">
-    <label>Quantidade</label>
-    <div class="input-wrapper">
-        <input type="number" id="campoQuantidade">
-        <span class="input-icon">🔢</span>
-    </div>
-</div>
-
-<button id="btnSalvar" class="btn-main" onclick="salvarEntrada()">Salvar Entrada</button>
-<button id="btnExcel" class="btn-main" onclick="gerarExcel()">Gerar Excel</button>
-<button id="btnReiniciar" class="btn-main" onclick="reiniciarEntradas()">Reiniciar Entradas</button>
-
-<h2>Inventário - Registros</h2>
-
-<div class="table-container">
-<table id="tabela">
-    <thead>
-        <tr>
-            <th>DATA</th>
-            <th>ÁREA</th>
-            <th>SKU</th>
-            <th>LOTE COMPLETO</th>
-            <th>LOTE</th>
-            <th>POST</th>
-            <th>TIPO</th>
-            <th>QUANTIDADE</th>
-            <th>AÇÃO</th>
-        </tr>
-    </thead>
-    <tbody></tbody>
-</table>
-</div>
-
-<script>
-function formatarDataBR(dataISO) {
-    let partes = dataISO.split("-");
-    return partes[2] + "/" + partes[1] + "/" + partes[0];
-}
-
-function converterDataISO(dataBR) {
-    let partes = dataBR.split("/");
-    return `${partes[2]}-${partes[1]}-${partes[0]}`;
-}
-
-function formatarLote() {
-    let v = campoLote3.value.replace(/[^0-9]/g, "");
-    if (v.length >= 2) campoLote3.value = "L" + v.substring(0, 2) + "." + v.substring(2, 4);
-}
-
-function formatarPostura() {
-    let v = campoLote10.value.replace(/[^0-9]/g, "");
-    if (v.length >= 2) campoLote10.value = "." + v.substring(0, 2) + "." + v.substring(2, 4) + "." + v.substring(4, 6);
-}
-
-function atualizarLoteCompleto() {
-    campoLote.value = campoLote3.value + " " + campoLote10.value;
-}
-
-function salvarEntrada() {
-    let dataISO = campoData.value;
-    let dataBR = formatarDataBR(dataISO);
-
-    let area = campoArea.value;
-    let sku = campoSku.value;
-    let loteCompleto = campoLote.value;
-    let lote = campoLote3.value;
-    let postura = campoLote10.value;
-    let tipo = campoTipo.value;
-    let quantidade = campoQuantidade.value;
-
-    if (!dataISO || !sku || !loteCompleto || !quantidade) {
-        alert("Preencha todos os campos obrigatórios.");
-        return;
-    }
-
-    let tbody = document.querySelector("#tabela tbody");
-    let linha = tbody.insertRow();
-
-    linha.innerHTML = `
-        <td>${dataBR}</td>
-        <td>${area}</td>
-        <td>${sku}</td>
-        <td>${loteCompleto}</td>
-        <td>${lote}</td>
-        <td>${postura}</td>
-        <td>${tipo}</td>
-        <td>${quantidade}</td>
-        <td>
-            <button class="btn-small btn-edit" onclick="editarLinha(this)">Editar</button>
-            <button class="btn-small btn-delete" onclick="excluirLinha(this)">Excluir</button>
-        </td>
-    `;
-
-    salvarLocalStorage();
-    limparCampos();
-}
-
-function editarLinha(botao) {
-    let linha = botao.parentNode.parentNode;
-    let celulas = linha.cells;
-
-    campoData.value = converterDataISO(celulas[0].innerText);
-    campoArea.value = celulas[1].innerText;
-    campoSku.value = celulas[2].innerText;
-    campoLote.value = celulas[3].innerText;
-    campoLote3.value = celulas[4].innerText;
-    campoLote10.value = celulas[5].innerText;
-    campoTipo.value = celulas[6].innerText;
-    campoQuantidade.value = celulas[7].innerText;
-
-    linha.remove();
-    salvarLocalStorage();
-}
-
-function excluirLinha(botao) {
-    if (confirm("Deseja excluir esta entrada?")) {
-        let linha = botao.parentNode.parentNode;
-        linha.remove();
-        salvarLocalStorage();
-    }
-}
-
-function salvarLocalStorage() {
-    let tbody = document.querySelector("#tabela tbody");
-    let dados = [];
-
-    for (let linha of tbody.rows) {
-        dados.push({
-            data: linha.cells[0].innerText,
-            area: linha.cells[1].innerText,
-            sku: linha.cells[2].innerText,
-            loteCompleto: linha.cells[3].innerText,
-            lote: linha.cells[4].innerText,
-            postura: linha.cells[5].innerText,
-            tipo: linha.cells[6].innerText,
-            quantidade: linha.cells[7].innerText
-        });
-    }
-
-    localStorage.setItem("entradas", JSON.stringify(dados));
-}
-
-function carregarLocalStorage() {
-    let dados = JSON.parse(localStorage.getItem("entradas") || "[]");
-    let tbody = document.querySelector("#tabela tbody");
-
-    dados.forEach(item => {
-        let linha = tbody.insertRow();
-        linha.innerHTML = `
-            <td>${item.data}</td>
-            <td>${item.area}</td>
-            <td>${item.sku}</td>
-            <td>${item.loteCompleto}</td>
-            <td>${item.lote}</td>
-            <td>${item.postura}</td>
-            <td>${item.tipo}</td>
-            <td>${item.quantidade}</td>
-            <td>
-                <button class="btn-small btn-edit" onclick="editarLinha(this)">Editar</button>
-                <button class="btn-small btn-delete" onclick="excluirLinha(this)">Excluir</button>
-            </td>
-        `;
-    });
-}
-
-function limparCampos() {
-    campoSku.value = "";
-    campoLote3.value = "";
-    campoLote10.value = "";
-    campoLote.value = "";
-    campoQuantidade.value = "";
-}
-
-function gerarExcel() {
-    let dados = JSON.parse(localStorage.getItem("entradas") || "[]");
-
-    if (dados.length === 0) {
-        alert("Nenhuma entrada para exportar.");
-        return;
-    }
-
-    let linhas = [
-        ["DATA", "ÁREA", "SKU", "LOTE COMPLETO", "LOTE", "POST", "TIPO", "QUANTIDADE"]
-    ];
-
-    dados.forEach(item => {
-        linhas.push([
-            item.data,
-            item.area,
-            item.sku,
-            item.loteCompleto,
-            item.lote,
-            item.postura,
-            item.tipo,
-            item.quantidade
-        ]);
-    });
-
-    let ws = XLSX.utils.aoa_to_sheet(linhas);
-    let wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Inventário");
-
-    XLSX.writeFile(wb, "inventario.xlsx");
-}
-
-function reiniciarEntradas() {
-    if (confirm("Tem certeza que deseja apagar todas as entradas?")) {
-        localStorage.removeItem("entradas");
-        document.querySelector("#tabela tbody").innerHTML = "";
-        alert("Entradas apagadas.");
-    }
-}
-</script>
+<form>
+    <input type="text" placeholder="Nome do lote">
+    <input type="number" placeholder="Quantidade de aves">
+    <input type="text" placeholder="Raça">
+    <input type="number" placeholder="Idade (em semanas)">
+    <textarea placeholder="Observações"></textarea>
+    <button type="submit">Salvar</button>
+</form>
 
 </body>
 </html>
-
