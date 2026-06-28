@@ -3,6 +3,7 @@
   "short_name": "Inventário",
   "description": "Aplicativo de controle de inventário.",
   "start_url": "home.html",
+  "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#000000",
@@ -19,13 +20,6 @@
       "sizes": "512x512",
       "type": "image/png"
     }
-  ],
-
-  "launch_screen": {
-    "image": "splash-2732x2732.png",
-    "background_color": "#000000",
-    "resize_mode": "contain"
-  }
+  ]
 }
-
 
