@@ -1,7 +1,6 @@
 {
   "name": "Inventário",
   "short_name": "Inventário",
-  "description": "Aplicativo de controle de inventário.",
   "start_url": "home.html",
   "scope": "./",
   "display": "standalone",
@@ -20,6 +19,9 @@
       "sizes": "512x512",
       "type": "image/png"
     }
+  ],
+
+  "splash_screens": [
+    "splash-2732x2732.png"
   ]
 }
-
