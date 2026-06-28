@@ -7,7 +7,6 @@
 <title>Inventário - Formulário</title>
 
 <style>
-    /* Remove qualquer rolagem lateral */
     html, body {
         margin: 0;
         padding: 0;
@@ -32,10 +31,9 @@
         width: 100%;
     }
 
-    /* CONTAINER RESPONSIVO REAL */
     .container {
         width: 100%;
-        max-width: 380px; /* tamanho ideal para celular */
+        max-width: 380px;
         padding: 0 20px;
         box-sizing: border-box;
         display: flex;
@@ -43,32 +41,7 @@
         gap: 15px;
     }
 
-    /* Remove ícones internos */
-    input,
-    select,
-    textarea {
-        background-image: none !important;
-        -webkit-appearance: none !important;
-        -moz-appearance: none !important;
-        appearance: none !important;
-    }
-
-    /* Remove ícone do calendário */
-    input[type="date"]::-webkit-calendar-picker-indicator {
-        display: none !important;
-    }
-
-    /* Remove setas do number */
-    input[type="number"]::-webkit-inner-spin-button,
-    input[type="number"]::-webkit-outer-spin-button {
-        -webkit-appearance: none !important;
-        margin: 0 !important;
-    }
-
-    /* Estilo dos campos */
-    input,
-    select,
-    textarea {
+    input, select {
         width: 100%;
         padding: 14px;
         font-size: 18px;
@@ -103,14 +76,37 @@
 
 <div class="container">
 
+    <!-- DATA -->
     <input type="text" placeholder="Data (dd/mm/aaaa)">
-    <input type="text" placeholder="Área">
+
+    <!-- ÁREA -->
+    <select>
+        <option value="">Selecione a área</option>
+        <option>ÁREA SUJA</option>
+        <option>ÁREA LIMPA</option>
+    </select>
+
+    <!-- TIPO (Caixa / Ovo / Quantidades) -->
+    <select>
+        <option value="">Selecione o tipo</option>
+        <option>CAIXA</option>
+        <option>OVO</option>
+        <option>QUANTIDADES</option>
+    </select>
+
+    <!-- SKU -->
     <input type="text" placeholder="SKU">
+
+    <!-- LOTE -->
     <input type="text" placeholder="Lote (formato Lxx.xx)">
+
+    <!-- DATA DE POSTURA -->
     <input type="text" placeholder="Data de Postura (.xx.xx.xx)">
+
     <button>Salvar</button>
 
 </div>
 
 </body>
 </html>
+
