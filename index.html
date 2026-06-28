@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-<title>Inventário - Cadastro</title>
+<title>Inventário - Formulário</title>
 
 <style>
     body {
@@ -32,15 +32,46 @@
         gap: 15px;
     }
 
-    input[type="text"],
-    input[type="number"],
-    input[type="email"],
+    /* Remove QUALQUER ícone interno */
+    input,
     select,
     textarea {
         background-image: none !important;
-        background-repeat: no-repeat;
-        background-position: left center;
-        background-size: 0;
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
+        appearance: none !important;
+    }
+
+    /* Remove ícones de calendário */
+    input[type="date"]::-webkit-calendar-picker-indicator {
+        display: none !important;
+        -webkit-appearance: none !important;
+    }
+
+    /* Remove setas de number */
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none !important;
+        margin: 0 !important;
+    }
+
+    /* Remove ícones automáticos do Chrome */
+    input::-webkit-search-decoration,
+    input::-webkit-search-cancel-button,
+    input::-webkit-search-results-button,
+    input::-webkit-search-results-decoration {
+        display: none !important;
+    }
+
+    /* Remove seta do select */
+    select::-ms-expand {
+        display: none !important;
+    }
+
+    /* Estilo dos campos */
+    input,
+    select,
+    textarea {
         width: 100%;
         padding: 14px;
         font-size: 18px;
@@ -77,14 +108,14 @@
 
 <body>
 
-<h2>Cadastro de Lotes</h2>
+<h2>Inventário - Formulário</h2>
 
 <form>
-    <input type="text" placeholder="Nome do lote">
-    <input type="number" placeholder="Quantidade de aves">
-    <input type="text" placeholder="Raça">
-    <input type="number" placeholder="Idade (em semanas)">
-    <textarea placeholder="Observações"></textarea>
+    <input type="text" placeholder="Data (dd/mm/aaaa)">
+    <input type="text" placeholder="Área">
+    <input type="text" placeholder="SKU">
+    <input type="text" placeholder="Lote (formato Lxx.xx)">
+    <input type="text" placeholder="Data de Postura (.xx.xx.xx)">
     <button type="submit">Salvar</button>
 </form>
 
