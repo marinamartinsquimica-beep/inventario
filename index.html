@@ -3,13 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-
 <title>Inventário</title>
 
 <link rel="manifest" href="manifest.json">
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
 <script>
 if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("service-worker.js");
@@ -18,222 +15,471 @@ if ("serviceWorker" in navigator) {
 
 <style>
     :root {
-        --bg: #121212;
-        --text: #ffffff;
-        --input-bg: #1e1e1e;
-        --input-border: #2e2e2e;
-        --input-focus: #3f8cff;
-        --table-bg: #1e1e1e;
-        --table-header: #2a2a2a;
-        --table-text: #ffffff;
+        --bg: #07111d;
+        --bg-2: #101418;
+        --card: #ffffff;
+        --text: #0f172a;
+        --muted: #64748b;
+        --line: #d9e2ec;
+        --input: #fbfdff;
+        --input-disabled: #edf2f7;
+        --primary: #0875d1;
+        --primary-dark: #065ca3;
+        --success: #22a447;
+        --success-dark: #168536;
+        --danger: #ef2d2d;
+        --danger-dark: #c91f1f;
+        --shadow: 0 22px 50px rgba(0, 0, 0, 0.30);
+        --radius: 18px;
     }
+
+    * { box-sizing: border-box; }
 
     body {
         font-family: Arial, sans-serif;
         margin: 0;
-        padding: 20px;
-        background: var(--bg);
+        min-height: 100vh;
+        background:
+            radial-gradient(circle at top left, rgba(8, 117, 209, 0.38), transparent 30%),
+            linear-gradient(135deg, #06111d 0%, #11171f 48%, #17191d 100%);
         color: var(--text);
+        padding: 18px;
+    }
+
+    .app {
+        width: 100%;
+        max-width: 1180px;
+        margin: 0 auto;
+    }
+
+    .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 18px;
+        margin-bottom: 18px;
+        border-radius: 24px;
+        background: linear-gradient(135deg, rgba(15, 30, 45, 0.90), rgba(39, 39, 39, 0.92));
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        box-shadow: 0 22px 48px rgba(0, 0, 0, 0.26);
+        backdrop-filter: blur(14px);
+    }
+
+    .brand {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        color: #fff;
+    }
+
+    .brand-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 18px;
+        background: #ffffff;
+        padding: 6px;
+        box-shadow: 0 12px 30px rgba(8, 117, 209, 0.34);
+        object-fit: contain;
+    }
+
+    .brand h1 {
+        margin: 0;
+        font-size: 30px;
+        line-height: 1.05;
+        letter-spacing: 0.2px;
+    }
+
+    .brand p {
+        margin: 7px 0 0;
+        color: rgba(255, 255, 255, 0.72);
+        font-size: 15px;
+    }
+
+    .date-pill {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        padding: 12px 18px;
+        border-radius: 999px;
+        font-weight: 800;
+        white-space: nowrap;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
     }
 
     h2 {
+        margin: 0 0 18px;
         font-size: 24px;
-        margin-bottom: 20px;
-        text-align: center;
+        color: var(--text);
+        letter-spacing: -0.3px;
     }
 
-    .input-group {
-        margin-bottom: 22px;
+    .layout {
+        display: grid;
+        grid-template-columns: minmax(300px, 420px) 1fr;
+        gap: 18px;
+        align-items: start;
     }
+
+    .card {
+        background: rgba(255, 255, 255, 0.98);
+        border: 1px solid rgba(255, 255, 255, 0.70);
+        border-radius: var(--radius);
+        padding: 20px;
+        box-shadow: var(--shadow);
+    }
+
+    .form-card {
+        position: sticky;
+        top: 18px;
+    }
+
+    .input-group { margin-bottom: 14px; }
 
     label {
-        font-size: 16px;
-        font-weight: bold;
-        margin-bottom: 6px;
         display: block;
+        font-size: 13px;
+        font-weight: 800;
+        color: #233047;
+        margin-bottom: 8px;
     }
 
-    .input-wrapper {
-        position: relative;
-    }
-
-    .input-wrapper input,
-    .input-wrapper select {
+    input, select {
         width: 100%;
-        padding: 16px 45px 16px 16px;
-        font-size: 18px;
-        border-radius: 14px;
-        border: 1px solid var(--input-border);
-        background: var(--input-bg);
-        color: var(--text);
+        height: 45px;
+        padding: 10px 14px;
+        border-radius: 11px;
+        border: 1px solid #cfd8e3;
+        background: var(--input);
+        color: #111827;
+        font-size: 15px;
         outline: none;
+        transition: 0.2s ease;
+        box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.03);
     }
 
-    .input-wrapper input:focus,
-    .input-wrapper select:focus {
-        border-color: var(--input-focus);
+    input:focus, select:focus {
+        border-color: var(--primary);
+        background: #ffffff;
+        box-shadow: 0 0 0 4px rgba(8, 117, 209, 0.12);
     }
 
-    .input-icon {
-        position: absolute;
-        right: 14px;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 22px;
-        opacity: 0.7;
+    input:disabled {
+        color: #667085;
+        background: var(--input-disabled);
     }
 
-    .btn-main {
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0 12px;
+    }
+
+    .full { grid-column: 1 / -1; }
+
+    .actions {
+        display: grid;
+        gap: 8px;
+        margin-top: 6px;
+    }
+
+    button {
         width: 100%;
-        padding: 20px;
-        font-size: 22px;
-        font-weight: bold;
-        border-radius: 14px;
+        padding: 13px 20px;
         border: none;
-        margin-top: 18px;
+        border-radius: 10px;
+        color: white;
+        font-size: 16px;
+        font-weight: 800;
         cursor: pointer;
+        transition: 0.2s ease;
     }
 
-    #btnSalvar { background: #4CAF50; color: white; }
-    #btnExcel  { background: #2196F3; color: white; }
-    #btnReiniciar { background: #f44336; color: white; }
+    button:hover { transform: translateY(-1px); filter: brightness(1.03); }
+    button:active { transform: translateY(0); }
+
+    #btnSalvar {
+        background: linear-gradient(180deg, #0875f5, #055fc9);
+        box-shadow: 0 10px 20px rgba(8, 117, 209, 0.24), inset 0 1px 0 rgba(255,255,255,0.20);
+    }
+
+    #btnExcel {
+        background: linear-gradient(180deg, #2eba4f, #159138);
+        box-shadow: 0 10px 20px rgba(34, 164, 71, 0.24), inset 0 1px 0 rgba(255,255,255,0.20);
+    }
+
+    #btnReiniciar {
+        background: linear-gradient(180deg, #ff3030, #d71919);
+        box-shadow: 0 10px 20px rgba(239, 45, 45, 0.22), inset 0 1px 0 rgba(255,255,255,0.20);
+    }
+
+    .table-card {
+        overflow: hidden;
+    }
+
+    .table-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 10px 14px;
+        border-radius: 14px;
+        color: #075db1;
+        background: #e0f2fe;
+        font-size: 14px;
+        font-weight: 800;
+    }
 
     .table-container {
+        position: relative;
         overflow-x: auto;
-        margin-top: 30px;
+        border-radius: 13px;
+        border: 1px solid var(--line);
+        margin-top: 0;
+        background: #ffffff;
+    }
+
+    .table-container.is-empty {
+        min-height: 520px;
     }
 
     table {
         width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        background: white;
         min-width: 900px;
-        border-collapse: collapse;
-        background: var(--table-bg);
-        color: var(--table-text);
+        color: var(--text);
     }
 
     th, td {
-        border: 1px solid var(--input-border);
-        padding: 14px;
+        border: none;
+        border-bottom: 1px solid #edf2f7;
+        padding: 14px 12px;
         text-align: center;
-        font-size: 18px;
+        font-size: 13px;
     }
 
     th {
-        background: var(--table-header);
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        background: #f1f5f9;
+        color: #172238;
+        font-size: 12px;
+        letter-spacing: 0.4px;
+        font-weight: 900;
+    }
+
+    tbody tr:nth-child(even) { background: #f8fafc; }
+    tbody tr:hover { background: #eef6ff; }
+    tbody tr:last-child td { border-bottom: none; }
+
+    .empty-state {
+        position: relative;
+        display: none;
+        min-height: 430px;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        text-align: center;
+        color: #0f172a;
+        pointer-events: none;
+        z-index: 1;
+        padding: 24px;
+    }
+
+    .empty-icon {
+        width: 92px;
+        height: 92px;
+        border-radius: 50%;
+        border: 1px solid #d4dde8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #8a94a3;
+        font-size: 48px;
+        margin-bottom: 22px;
+    }
+
+    .empty-state strong {
+        font-size: 20px;
+        margin-bottom: 8px;
+    }
+
+    .empty-state span {
+        color: #334155;
+        font-size: 16px;
+        line-height: 1.45;
+        max-width: 390px;
     }
 
     .btn-small {
-        padding: 10px 16px;
-        font-size: 16px;
+        width: auto;
+        padding: 9px 12px;
+        margin: 2px;
+        font-size: 13px;
         border-radius: 10px;
-        border: none;
-        cursor: pointer;
+        box-shadow: none;
+        white-space: nowrap;
     }
 
-    .btn-edit { background: #2196F3; color: white; }
-    .btn-delete { background: #f44336; color: white; }
-</style>
+    .btn-edit { background: linear-gradient(180deg, #0875f5, #055fc9); }
+    .btn-delete { background: linear-gradient(180deg, #ff3030, #d71919); }
 
+    .footer {
+        margin-top: 18px;
+        padding: 12px 18px;
+        border-radius: 18px;
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.10);
+        color: rgba(255,255,255,0.76);
+        text-align: center;
+        font-size: 14px;
+        box-shadow: 0 14px 32px rgba(0,0,0,0.18);
+    }
+
+    .footer strong { color: #fff; }
+
+    ::-webkit-scrollbar { height: 12px; width: 12px; }
+    ::-webkit-scrollbar-track { background: rgba(226, 232, 240, 0.8); border-radius: 999px; }
+    ::-webkit-scrollbar-thumb { background: #9aa0a6; border-radius: 999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #7e858c; }
+
+    @media (max-width: 900px) {
+        body { padding: 12px; }
+        .layout { grid-template-columns: 1fr; }
+        .form-card { position: static; }
+    }
+
+    @media (max-width: 560px) {
+        .topbar {
+            align-items: flex-start;
+            flex-direction: column;
+            border-radius: 20px;
+        }
+        .brand h1 { font-size: 26px; }
+        .brand-icon { width: 52px; height: 52px; }
+        .form-grid { grid-template-columns: 1fr; }
+        .card { padding: 16px; }
+        h2 { font-size: 22px; }
+        .date-pill { font-size: 14px; }
+    }
+</style>
 </head>
 <body onload="carregarLocalStorage()">
 
-<h2>Inventário - Formulário</h2>
+<div class="app">
+    <header class="topbar">
+        <div class="brand">
+            <img src="icon-512.png" alt="Ícone Inventário" class="brand-icon">
+            <div>
+                <h1>Inventário</h1>
+                <p>Controle rápido de registros</p>
+            </div>
+        </div>
+        <div class="date-pill">📋 Registros salvos no aparelho</div>
+    </header>
 
-<div class="input-group">
-    <label>Data</label>
-    <div class="input-wrapper">
-        <input type="date" id="campoData">
-        <span class="input-icon">📅</span>
-    </div>
-</div>
+    <main class="layout">
+        <section class="card form-card">
+            <h2>Inventário - Formulário</h2>
 
-<div class="input-group">
-    <label>Área</label>
-    <div class="input-wrapper">
-        <select id="campoArea">
-            <option value="ÁREA SUJA">ÁREA SUJA</option>
-            <option value="ÁREA LIMPA">ÁREA LIMPA</option>
-        </select>
-        <span class="input-icon">📍</span>
-    </div>
-</div>
+            <div class="form-grid">
+                <div class="input-group">
+                    <label>Data</label>
+                    <input type="date" id="campoData">
+                </div>
 
-<div class="input-group">
-    <label>SKU</label>
-    <div class="input-wrapper">
-        <input type="text" id="campoSku">
-        <span class="input-icon">🔢</span>
-    </div>
-</div>
+                <div class="input-group">
+                    <label>Área</label>
+                    <select id="campoArea">
+                        <option value="ÁREA SUJA">ÁREA SUJA</option>
+                        <option value="ÁREA LIMPA">ÁREA LIMPA</option>
+                    </select>
+                </div>
 
-<div class="input-group">
-    <label>Lote (formato Lxx.xx)</label>
-    <div class="input-wrapper">
-        <input type="text" id="campoLote3" maxlength="6"
-               oninput="formatarLote(); atualizarLoteCompleto();">
-        <span class="input-icon">🏷️</span>
-    </div>
-</div>
+                <div class="input-group full">
+                    <label>SKU</label>
+                    <input type="text" id="campoSku">
+                </div>
 
-<div class="input-group">
-    <label>Data de Postura (.xx.xx.xx)</label>
-    <div class="input-wrapper">
-        <input type="text" id="campoLote10" maxlength="9"
-               oninput="formatarPostura(); atualizarLoteCompleto();">
-        <span class="input-icon">🥚</span>
-    </div>
-</div>
+                <div class="input-group">
+                    <label>Lote (formato Lxx.xx)</label>
+                    <input type="text" id="campoLote3" maxlength="6" oninput="formatarLote(); atualizarLoteCompleto();">
+                </div>
 
-<div class="input-group">
-    <label>Lote Completo</label>
-    <div class="input-wrapper">
-        <input type="text" id="campoLote" disabled>
-        <span class="input-icon">✔️</span>
-    </div>
-</div>
+                <div class="input-group">
+                    <label>Data de Postura (formato .xx.xx.xx)</label>
+                    <input type="text" id="campoLote10" maxlength="9" oninput="formatarPostura(); atualizarLoteCompleto();">
+                </div>
 
-<div class="input-group">
-    <label>Tipo</label>
-    <div class="input-wrapper">
-        <select id="campoTipo">
-            <option value="CAIXA">CAIXA</option>
-            <option value="OVOS">OVOS</option>
-        </select>
-        <span class="input-icon">📦</span>
-    </div>
-</div>
+                <div class="input-group full">
+                    <label>Lote Completo</label>
+                    <input type="text" id="campoLote" disabled>
+                </div>
 
-<div class="input-group">
-    <label>Quantidade</label>
-    <div class="input-wrapper">
-        <input type="number" id="campoQuantidade">
-        <span class="input-icon">🔢</span>
-    </div>
-</div>
+                <div class="input-group">
+                    <label>Tipo</label>
+                    <select id="campoTipo">
+                        <option value="CAIXA">CAIXA</option>
+                        <option value="OVOS">OVOS</option>
+                    </select>
+                </div>
 
-<button id="btnSalvar" class="btn-main" onclick="salvarEntrada()">Salvar Entrada</button>
-<button id="btnExcel" class="btn-main" onclick="gerarExcel()">Gerar Excel</button>
-<button id="btnReiniciar" class="btn-main" onclick="reiniciarEntradas()">Reiniciar Entradas</button>
+                <div class="input-group">
+                    <label>Quantidade</label>
+                    <input type="number" id="campoQuantidade">
+                </div>
+            </div>
 
-<h2>Inventário - Registros</h2>
+            <div class="actions">
+                <button id="btnSalvar" class="btn-main" onclick="salvarEntrada()">💾 Salvar Entrada</button>
+                <button id="btnExcel" class="btn-main" onclick="gerarExcel()">📊 Gerar Excel</button>
+                <button id="btnReiniciar" class="btn-main" onclick="reiniciarEntradas()">🗑️ Reiniciar Entradas</button>
+            </div>
+        </section>
 
-<div class="table-container">
-<table id="tabela">
-    <thead>
-        <tr>
-            <th>DATA</th>
-            <th>ÁREA</th>
-            <th>SKU</th>
-            <th>LOTE COMPLETO</th>
-            <th>LOTE</th>
-            <th>POST</th>
-            <th>TIPO</th>
-            <th>QUANTIDADE</th>
-            <th>AÇÃO</th>
-        </tr>
-    </thead>
-    <tbody></tbody>
-</table>
+        <section class="card table-card">
+            <div class="table-header">
+                <h2>Inventário - Registros</h2>
+                <span class="badge">📦 Lista</span>
+            </div>
+
+            <div class="table-container">
+                <table id="tabela">
+                    <thead>
+                        <tr>
+                            <th>DATA</th>
+                            <th>ÁREA</th>
+                            <th>SKU</th>
+                            <th>LOTE COMPLETO</th>
+                            <th>LOTE</th>
+                            <th>POST</th>
+                            <th>TIPO</th>
+                            <th>QUANTIDADE</th>
+                            <th>AÇÃO</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-icon">📋</div>
+                    <strong>Nenhum registro encontrado</strong>
+                    <span>Preencha o formulário ao lado para adicionar<br>seu primeiro registro.</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">🛡️ <strong>Inventário</strong> &nbsp;•&nbsp; Todos os dados são salvos localmente no seu aparelho</footer>
 </div>
 
 <script>
@@ -298,6 +544,7 @@ function salvarEntrada() {
 
     salvarLocalStorage();
     limparCampos();
+    atualizarEstadoTabela();
 }
 
 function editarLinha(botao) {
@@ -315,6 +562,7 @@ function editarLinha(botao) {
 
     linha.remove();
     salvarLocalStorage();
+    atualizarEstadoTabela();
 }
 
 function excluirLinha(botao) {
@@ -322,6 +570,7 @@ function excluirLinha(botao) {
         let linha = botao.parentNode.parentNode;
         linha.remove();
         salvarLocalStorage();
+        atualizarEstadoTabela();
     }
 }
 
@@ -366,6 +615,7 @@ function carregarLocalStorage() {
             </td>
         `;
     });
+    atualizarEstadoTabela();
 }
 
 function limparCampos() {
@@ -412,11 +662,22 @@ function reiniciarEntradas() {
     if (confirm("Tem certeza que deseja apagar todas as entradas?")) {
         localStorage.removeItem("entradas");
         document.querySelector("#tabela tbody").innerHTML = "";
+        atualizarEstadoTabela();
         alert("Entradas apagadas.");
     }
+}
+
+
+function atualizarEstadoTabela() {
+    const tbody = document.querySelector("#tabela tbody");
+    const emptyState = document.getElementById("emptyState");
+    if (!tbody || !emptyState) return;
+    const tableContainer = document.querySelector(".table-container");
+    const vazia = tbody.rows.length === 0;
+    emptyState.style.display = vazia ? "flex" : "none";
+    if (tableContainer) tableContainer.classList.toggle("is-empty", vazia);
 }
 </script>
 
 </body>
 </html>
-
