@@ -1,6 +1,9 @@
-const CACHE_NAME = "inventario-cache-v4";
+const CACHE_NAME = "inventario-cache-v5";
+
 const FILES_TO_CACHE = [
   "./",
+  "./home.html",
+  "./inicio.html",
   "./index.html",
   "./manifest.json",
   "./icon-192.png",
@@ -8,15 +11,12 @@ const FILES_TO_CACHE = [
   "./splash-2732x2732.png"
 ];
 
-// Instala e faz cache inicial
 self.addEventListener("install", event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(FILES_TO_CACHE))
   );
-  self.skipWaiting();
 });
 
-// Ativa e limpa caches antigos
 self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys().then(keys =>
@@ -26,17 +26,47 @@ self.addEventListener("activate", event => {
   self.clients.claim();
 });
 
-// Busca otimizada com fallback offline
+self.addEventListener("message", event => {
+  if (event.data && event.data.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
+});
+
 self.addEventListener("fetch", event => {
-  event.respondWith(
-    caches.match(event.request).then(response => {
-      return (
-        response ||
-        fetch(event.request).catch(() =>
-          caches.match("./index.html")
+  const request = event.request;
+  if (request.method !== "GET") return;
+
+  const url = new URL(request.url);
+
+  if (request.mode === "navigate" || (request.headers.get("accept") || "").includes("text/html")) {
+    event.respondWith(
+      fetch(request)
+        .then(response => {
+          const copy = response.clone();
+          if (url.origin === self.location.origin) {
+            caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
+          }
+          return response;
+        })
+        .catch(() =>
+          caches.match(request).then(response =>
+            response || caches.match("./home.html") || caches.match("./index.html")
+          )
         )
-      );
+    );
+    return;
+  }
+
+  event.respondWith(
+    caches.match(request).then(cached => {
+      if (cached) return cached;
+      return fetch(request).then(response => {
+        if (url.origin === self.location.origin && response.ok) {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
+        }
+        return response;
+      });
     })
   );
 });
-
