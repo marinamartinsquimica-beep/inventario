@@ -7,8 +7,10 @@
 
 <link rel="manifest" href="manifest.json">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://marinamartinsquimica-beep.github.io/romaneio-data-matrix-caminhao/vendor/zxing.min.js"></script>
+<script src="https://marinamartinsquimica-beep.github.io/romaneio-data-matrix-caminhao/qr-parser.js"></script>
 <script>
-window.APP_VERSION = "2.1.0";
+window.APP_VERSION = "2.1.1";
 
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
@@ -135,7 +137,8 @@ body{margin:0;min-height:100vh;font-family:Arial,sans-serif;background:radial-gr
                     <h2>Inventário - Formulário</h2>
                     <div class="form-grid">
                         <div class="input-group"><label>Data</label><input type="date" id="campoData"></div>
-                        <div class="input-group"><label>Área</label><select id="campoArea"><option value="ÁREA SUJA">ÁREA SUJA</option><option value="ÁREA LIMPA">ÁREA LIMPA</option></select></div>
+                        <div class="input-group"><label>Área</label><select id="campoArea" onchange="atualizarScannerInventario()"><option value="ÁREA SUJA">ÁREA SUJA</option><option value="ÁREA LIMPA">ÁREA LIMPA</option></select></div>
+                        <div class="input-group full" id="inventarioScannerControls" style="display:none"><button type="button" class="btn-main" style="background:linear-gradient(180deg,#0875f5,#055fc9)" onclick="abrirScannerInventario()">📷 Ler Data Matrix</button><div id="inventarioScannerPanel" style="display:none;margin-top:10px;padding:10px;border-radius:12px;background:#0f172a;color:white"><video id="inventarioScannerVideo" playsinline muted autoplay style="width:100%;max-height:320px;background:black;border-radius:8px"></video><canvas id="inventarioScannerCanvas" style="display:none"></canvas><p id="inventarioScannerStatus" style="color:white">Aponte para o Data Matrix.</p><button type="button" class="btn-main btn-red" onclick="pararScannerInventario()">Fechar câmera</button></div></div>
                         <div class="input-group full"><label>SKU</label><input type="text" id="campoSku"></div>
                         <div class="input-group"><label>Lote (formato Lxx.xx)</label><input type="text" id="campoLote3" maxlength="6" oninput="formatarLote(); atualizarLoteCompleto();"></div>
                         <div class="input-group"><label>Data de Postura (formato .xx.xx.xx)</label><input type="text" id="campoLote10" maxlength="9" oninput="formatarPostura(); atualizarLoteCompleto();"></div>
@@ -155,9 +158,9 @@ body{margin:0;min-height:100vh;font-family:Arial,sans-serif;background:radial-gr
 
         <section id="view-relatorios" class="view"><section class="card"><h2>Relatórios</h2><p>Exporte seus dados em Excel ou faça backup completo das entradas.</p><div class="actions" style="max-width:420px"><button class="btn-main btn-green" onclick="gerarExcel()">📊 Gerar Excel</button><button class="btn-main" id="btnSalvar" onclick="exportarBackup()">⬇️ Exportar Backup JSON</button><button class="btn-main btn-red" onclick="reiniciarEntradas()">🗑️ Reiniciar Entradas</button></div></section></section>
 
-        <section id="view-config" class="view"><section class="card"><h2>Configurações</h2><div class="settings-grid"><div class="setting-item"><h3>Sistema local</h3><p>Os dados são salvos no armazenamento local do aparelho.</p><button class="btn-main btn-green" onclick="exportarBackup()">Exportar backup</button></div><div class="setting-item"><h3>Importar backup</h3><p>Restaure entradas salvas em arquivo JSON.</p><input type="file" id="importFile" accept="application/json" onchange="importarBackup(event)"></div><div class="setting-item"><h3>Versão</h3><p>Inventário v2.1 - Software local PWA com atualização automática.</p><button class="btn-main" id="btnSalvar" onclick="aplicarAtualizacao()">Verificar atualização</button></div><div class="setting-item"><h3>Limpar dados</h3><p>Apaga todas as entradas salvas neste aparelho.</p><button class="btn-main btn-red" onclick="reiniciarEntradas()">Apagar entradas</button></div></div></section></section>
+        <section id="view-config" class="view"><section class="card"><h2>Configurações</h2><div class="settings-grid"><div class="setting-item"><h3>Sistema local</h3><p>Os dados são salvos no armazenamento local do aparelho.</p><button class="btn-main btn-green" onclick="exportarBackup()">Exportar backup</button></div><div class="setting-item"><h3>Importar backup</h3><p>Restaure entradas salvas em arquivo JSON.</p><input type="file" id="importFile" accept="application/json" onchange="importarBackup(event)"></div><div class="setting-item"><h3>Versão</h3><p>Inventário v2.1.1 - Software local PWA com atualização automática.</p><button class="btn-main" id="btnSalvar" onclick="aplicarAtualizacao()">Verificar atualização</button></div><div class="setting-item"><h3>Limpar dados</h3><p>Apaga todas as entradas salvas neste aparelho.</p><button class="btn-main btn-red" onclick="reiniciarEntradas()">Apagar entradas</button></div></div></section></section>
 
-        <footer class="footer">🛡️ <strong>Inventário v2.1</strong> &nbsp;•&nbsp; Todos os dados são salvos localmente no seu aparelho</footer>
+        <footer class="footer">🛡️ <strong>Inventário v2.1.1</strong> &nbsp;•&nbsp; Todos os dados são salvos localmente no seu aparelho</footer>
     </main>
 </div>
 <div class="toast" id="toast"><b id="toastTitle">Sucesso!</b><span id="toastText">Ação concluída.</span></div>
@@ -196,6 +199,80 @@ function gerarExcel(){let dados=obterDados();if(dados.length===0){toast('Atenç�
 function reiniciarEntradas(){if(confirm('Tem certeza que deseja apagar todas as entradas?')){localStorage.removeItem('entradas');atualizarInterface();toast('Entradas apagadas','Todos os registros foram removidos.');}}
 function exportarBackup(){const dados=obterDados();const blob=new Blob([JSON.stringify(dados,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='backup-inventario.json';a.click();URL.revokeObjectURL(a.href);toast('Backup gerado','Arquivo JSON exportado.');}
 function importarBackup(event){const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=()=>{try{const dados=JSON.parse(reader.result);if(!Array.isArray(dados))throw new Error();definirDados(dados);atualizarInterface();toast('Backup importado','Registros restaurados com sucesso.');}catch(e){toast('Erro','Arquivo de backup inválido.');}};reader.readAsText(file);}
+
+let inventarioCamera = null, inventarioFrame = 0, inventarioReader = null, inventarioBusy = false, inventarioUltimoFrame = 0;
+function atualizarScannerInventario() {
+  const areaLimpa = document.getElementById('campoArea').value === 'ÁREA LIMPA';
+  document.getElementById('inventarioScannerControls').style.display = areaLimpa ? 'block' : 'none';
+  if (!areaLimpa) pararScannerInventario();
+}
+function pararScannerInventario() {
+  cancelAnimationFrame(inventarioFrame);
+  inventarioFrame = 0;
+  if (inventarioCamera) inventarioCamera.getTracks().forEach(track => track.stop());
+  inventarioCamera = null;
+  const video = document.getElementById('inventarioScannerVideo');
+  if (video) video.srcObject = null;
+  document.getElementById('inventarioScannerPanel').style.display = 'none';
+}
+async function abrirScannerInventario() {
+  pararScannerInventario();
+  const painel = document.getElementById('inventarioScannerPanel');
+  const status = document.getElementById('inventarioScannerStatus');
+  painel.style.display = 'block';
+  status.textContent = 'Solicitando câmera...';
+  try {
+    if (!navigator.mediaDevices?.getUserMedia || !window.ZXing?.MultiFormatReader || !window.qrPaleteParser) throw Error('Leitor indisponível neste navegador.');
+    const hints = new Map();
+    hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS,[ZXing.BarcodeFormat.DATA_MATRIX]);
+    hints.set(ZXing.DecodeHintType.TRY_HARDER,true);
+    inventarioReader = new ZXing.MultiFormatReader();
+    inventarioReader.setHints(hints);
+    inventarioCamera = await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false});
+    const video = document.getElementById('inventarioScannerVideo');
+    video.srcObject = inventarioCamera;
+    await video.play();
+    status.textContent = 'Aponte a câmera para o Data Matrix.';
+    inventarioFrame = requestAnimationFrame(processarScannerInventario);
+  } catch(e) {
+    pararScannerInventario();
+    painel.style.display = 'block';
+    status.textContent = e.message || 'Não foi possível abrir a câmera.';
+  }
+}
+function processarScannerInventario(timestamp) {
+  if (!inventarioCamera) return;
+  inventarioFrame = requestAnimationFrame(processarScannerInventario);
+  if (inventarioBusy || timestamp - inventarioUltimoFrame < 160) return;
+  const video = document.getElementById('inventarioScannerVideo');
+  if (video.readyState < 2 || !video.videoWidth) return;
+  inventarioUltimoFrame = timestamp;
+  inventarioBusy = true;
+  try {
+    const canvas = document.getElementById('inventarioScannerCanvas');
+    canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d',{willReadFrequently:true});
+    ctx.drawImage(video,0,0,canvas.width,canvas.height);
+    const pixels = ctx.getImageData(0,0,canvas.width,canvas.height);
+    const source = new ZXing.RGBLuminanceSource(new Int32Array(pixels.data.buffer,pixels.data.byteOffset,pixels.width*pixels.height),pixels.width,pixels.height);
+    const bitmap = new ZXing.BinaryBitmap(new ZXing.HybridBinarizer(source));
+    const result = inventarioReader.decode(bitmap);
+    const dados = window.qrPaleteParser.parse(result.getText?.() || result.text);
+    campoSku.value = dados.sku;
+    campoLote3.value = dados.lote;
+    campoLote10.value = dados.postura;
+    atualizarLoteCompleto();
+    pararScannerInventario();
+    toast('Data Matrix lido','Confira os dados e informe a quantidade para salvar.');
+  } catch(e) {
+    if (e?.message && !/not found|checksum|format|no multi/i.test(e.message)) {
+      document.getElementById('inventarioScannerStatus').textContent = e.message;
+    }
+    inventarioReader?.reset();
+  } finally { inventarioBusy = false; }
+}
+document.addEventListener('DOMContentLoaded',atualizarScannerInventario);
+document.addEventListener('change',e=>{if(e.target?.id==='campoArea')atualizarScannerInventario()});
 </script>
 </body>
 </html>
