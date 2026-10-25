@@ -128,10 +128,27 @@ if ("serviceWorker" in navigator) {
     <h1>Inventário</h1>
     <p>Controle rápido e fácil de lotes, postura e estoque.</p>
     <button class="btn" onclick="window.location.href='index.html'">Entrar</button>
-    <button class="btn" id="btnAtualizarHome" style="margin-top:12px;background:linear-gradient(135deg,#159138,#087d35);font-size:16px" onclick="atualizarInventarioHome()">🔄 Atualizar agora</button>
+    <button class="btn" id="btnAtualizarHome" style="display:none;margin-top:12px;background:linear-gradient(135deg,#159138,#087d35);font-size:16px" onclick="atualizarInventarioHome()">🔄 Atualizar agora</button>
     <span class="version">Inventário v2.1.3</span>
   </div>
 <script>
+async function verificarNovaVersaoHome() {
+  if (!('serviceWorker' in navigator)) return;
+  try {
+    const registro = await navigator.serviceWorker.register('service-worker.js');
+    const botao = document.getElementById('btnAtualizarHome');
+    const mostrar = () => { if (registro.waiting && navigator.serviceWorker.controller) botao.style.display = 'block'; };
+    mostrar();
+    registro.addEventListener('updatefound', () => {
+      const worker = registro.installing;
+      worker?.addEventListener('statechange', () => {
+        if (worker.state === 'installed') mostrar();
+      });
+    });
+    await registro.update();
+  } catch (_) {}
+}
+window.addEventListener('load', verificarNovaVersaoHome);
 async function atualizarInventarioHome() {
   const botao = document.getElementById('btnAtualizarHome');
   botao.textContent = 'Verificando atualização...';
