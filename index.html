@@ -10,7 +10,7 @@
 <script src="https://marinamartinsquimica-beep.github.io/romaneio-data-matrix-caminhao/vendor/zxing.min.js"></script>
 <script src="https://marinamartinsquimica-beep.github.io/romaneio-data-matrix-caminhao/qr-parser.js"></script>
 <script>
-window.APP_VERSION = "2.1.1";
+window.APP_VERSION = "2.1.2";
 
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
@@ -158,9 +158,9 @@ body{margin:0;min-height:100vh;font-family:Arial,sans-serif;background:radial-gr
 
         <section id="view-relatorios" class="view"><section class="card"><h2>Relatórios</h2><p>Exporte seus dados em Excel ou faça backup completo das entradas.</p><div class="actions" style="max-width:420px"><button class="btn-main btn-green" onclick="gerarExcel()">📊 Gerar Excel</button><button class="btn-main" id="btnSalvar" onclick="exportarBackup()">⬇️ Exportar Backup JSON</button><button class="btn-main btn-red" onclick="reiniciarEntradas()">🗑️ Reiniciar Entradas</button></div></section></section>
 
-        <section id="view-config" class="view"><section class="card"><h2>Configurações</h2><div class="settings-grid"><div class="setting-item"><h3>Sistema local</h3><p>Os dados são salvos no armazenamento local do aparelho.</p><button class="btn-main btn-green" onclick="exportarBackup()">Exportar backup</button></div><div class="setting-item"><h3>Importar backup</h3><p>Restaure entradas salvas em arquivo JSON.</p><input type="file" id="importFile" accept="application/json" onchange="importarBackup(event)"></div><div class="setting-item"><h3>Versão</h3><p>Inventário v2.1.1 - Software local PWA com atualização automática.</p><button class="btn-main" id="btnSalvar" onclick="aplicarAtualizacao()">Verificar atualização</button></div><div class="setting-item"><h3>Limpar dados</h3><p>Apaga todas as entradas salvas neste aparelho.</p><button class="btn-main btn-red" onclick="reiniciarEntradas()">Apagar entradas</button></div></div></section></section>
+        <section id="view-config" class="view"><section class="card"><h2>Configurações</h2><div class="settings-grid"><div class="setting-item"><h3>Sistema local</h3><p>Os dados são salvos no armazenamento local do aparelho.</p><button class="btn-main btn-green" onclick="exportarBackup()">Exportar backup</button></div><div class="setting-item"><h3>Importar backup</h3><p>Restaure entradas salvas em arquivo JSON.</p><input type="file" id="importFile" accept="application/json" onchange="importarBackup(event)"></div><div class="setting-item"><h3>Versão</h3><p>Inventário v2.1.2 - Software local PWA com atualização automática.</p><button class="btn-main" id="btnSalvar" onclick="aplicarAtualizacao()">Verificar atualização</button></div><div class="setting-item"><h3>Limpar dados</h3><p>Apaga todas as entradas salvas neste aparelho.</p><button class="btn-main btn-red" onclick="reiniciarEntradas()">Apagar entradas</button></div></div></section></section>
 
-        <footer class="footer">🛡️ <strong>Inventário v2.1.1</strong> &nbsp;•&nbsp; Todos os dados são salvos localmente no seu aparelho</footer>
+        <footer class="footer">🛡️ <strong>Inventário v2.1.2</strong> &nbsp;•&nbsp; Todos os dados são salvos localmente no seu aparelho</footer>
     </main>
 </div>
 <div class="toast" id="toast"><b id="toastTitle">Sucesso!</b><span id="toastText">Ação concluída.</span></div>
@@ -187,8 +187,9 @@ function excluirIndice(i){if(confirm('Deseja excluir esta entrada?')){let dados=
 function editarLinha(botao){editarIndice(Number(botao.dataset.index));}
 function excluirLinha(botao){excluirIndice(Number(botao.dataset.index));}
 function salvarLocalStorage(){/* mantido por compatibilidade */}
-function carregarLocalStorage(){atualizarInterface();}
-function limparCampos(){campoSku.value="";campoLote3.value="";campoLote10.value="";campoLote.value="";campoQuantidade.value="";}
+function carregarLocalStorage(){definirDataHojeInventario();atualizarScannerInventario();atualizarInterface();}
+function definirDataHojeInventario(){const d=new Date();const local=new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);document.getElementById("campoData").value=local;}
+function limparCampos(){definirDataHojeInventario();campoSku.value="";campoLote3.value="";campoLote10.value="";campoLote.value="";campoQuantidade.value="";}
 function linhaHtml(item,i){return `<tr><td>${item.data}</td><td>${item.area}</td><td>${item.sku}</td><td>${item.loteCompleto}</td><td>${item.lote}</td><td>${item.postura}</td><td>${item.tipo}</td><td>${item.quantidade}</td><td><button class="btn-small btn-edit" data-index="${i}" onclick="editarLinha(this)">Editar</button><button class="btn-small btn-delete" data-index="${i}" onclick="excluirLinha(this)">Excluir</button></td></tr>`;}
 function atualizarInterface(){const dados=obterDados();const tbody=document.querySelector('#tabela tbody');if(tbody)tbody.innerHTML=dados.map(linhaHtml).join('');atualizarEstadoTabela();renderTabelaFiltrada();renderDashboard();}
 function atualizarEstadoTabela(){const tbody=document.querySelector('#tabela tbody');const emptyState=document.getElementById('emptyState');const cont=document.getElementById('containerRegistro');if(!tbody||!emptyState)return;const vazia=tbody.rows.length===0;emptyState.style.display=vazia?'flex':'none';if(cont)cont.classList.toggle('is-empty',vazia);}
@@ -228,7 +229,7 @@ async function abrirScannerInventario() {
     hints.set(ZXing.DecodeHintType.TRY_HARDER,true);
     inventarioReader = new ZXing.MultiFormatReader();
     inventarioReader.setHints(hints);
-    inventarioCamera = await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false});
+    inventarioCamera = await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}},audio:false});
     const video = document.getElementById('inventarioScannerVideo');
     video.srcObject = inventarioCamera;
     await video.play();
@@ -243,7 +244,7 @@ async function abrirScannerInventario() {
 function processarScannerInventario(timestamp) {
   if (!inventarioCamera) return;
   inventarioFrame = requestAnimationFrame(processarScannerInventario);
-  if (inventarioBusy || timestamp - inventarioUltimoFrame < 160) return;
+  if (inventarioBusy || timestamp - inventarioUltimoFrame < 80) return;
   const video = document.getElementById('inventarioScannerVideo');
   if (video.readyState < 2 || !video.videoWidth) return;
   inventarioUltimoFrame = timestamp;
